@@ -235,7 +235,7 @@ def graphically_test_model(model_path, classes_names, test_image_path, image_siz
     plt.show()
 
 
-def train_and_save_VGG16_based_model(percentage=0.9, nbr_epochs=10, batch_size=32):
+def train_and_save_VGG16_based_model(dataset_path, percentage=0.9, nbr_epochs=10, batch_size=32):
     """
     :param percentage: percentage of samples to be used for training. Must be in [0,1].
     :param nbr_epochs:
@@ -253,7 +253,7 @@ def train_and_save_VGG16_based_model(percentage=0.9, nbr_epochs=10, batch_size=3
     if not os.path.exists(VGG16_based_model_save_folder):
         os.makedirs(VGG16_based_model_save_folder)
 
-    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset("datasets/small/", classes, percentage)
+    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, percentage)
 
     training_sample_generator = generate_from_paths_and_labels(train_samples, train_labels, batch_size,
                                                                image_size=(224, 224, 3))
