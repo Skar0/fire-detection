@@ -3,6 +3,8 @@ import os
 import imghdr
 import math
 import cv2
+from keras.applications import InceptionV3
+from keras.callbacks import ModelCheckpoint, TensorBoard
 from matplotlib import pyplot as plt
 from keras import Model
 from keras.engine.saving import load_model
@@ -53,6 +55,31 @@ def download_and_setup_medium_dataset():
               "datasets/defi1certif-datasets-fire_medium datasets/medium")
 
 
+def download_and_setup_large_dataset():
+    # downloading the large dataset
+    os.system(
+        'wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/defi1certif-datasets-fire_big.tar.001')
+    os.system(
+        'wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/defi1certif-datasets-fire_big.tar.002')
+    os.system(
+        'wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/defi1certif-datasets-fire_big.tar.003')
+    os.system(
+        'wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/defi1certif-datasets-fire_big.tar.004')
+
+    datasets_path = "datasets"
+    if os.path.exists(datasets_path) == False:
+        os.makedirs(datasets_path)
+
+    # recombine the tar files
+    os.system("cat  defi1certif-datasets-fire_big.tar.001 defi1certif-datasets-fire_big.tar.002 "
+              "defi1certif-datasets-fire_big.tar.003 defi1certif-datasets-fire_big.tar.001 >> "
+              "defi1certif-datasets-fire_big.tar")
+
+    # put the large dataset in datasets/large
+    os.system("tar xf defi1certif-datasets-fire_big.tar - C 'datasets' --one-top-level && mv "
+              "datasets/defi1certif-datasets-fire_big datasets/large")
+
+
 def setup_full_dataset():
     """
     Combines all datasets in a single folder.
@@ -78,6 +105,12 @@ def setup_full_dataset():
     os.system("find datasets/medium/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/")
     os.system("find datasets/medium/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/")
     os.system("find datasets/medium/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/")
+
+    # moving images from the large dataset to the full dataset
+    os.system("find datasets/large/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/")
+    os.system("find datasets/large/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/")
+    os.system("find datasets/large/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/")
+
 
 def generate_from_paths_and_labels(images_paths, labels, batch_size, image_size=(224, 224),
                                    preprocessing=preprocess_input):
@@ -275,3 +308,89 @@ def train_and_save_VGG16_based_model(dataset_path, percentage=0.9, nbr_epochs=10
 
     VGG16_based_model_save_path = VGG16_based_model_save_folder + "trained_save.h5"
     VGG16_based_model.save(VGG16_based_model_save_path)
+
+
+def create_Inception_based_model():
+    """
+    Inception-based model.
+    :return: the model.
+    """
+    # weights are pre-trained with imagenet
+    base_model = InceptionV3(include_top=False, weights='imagenet', pooling='max', input_shape=(224, 224, 3))
+
+    x = base_model.output
+    x = Dense(512, activation='relu')(x)
+    x = Dense(256, activation='relu')(x)
+    x = Dense(128, activation='relu')(x)
+    predictions = Dense(nbr_classes, activation='softmax')(x)  # dense layer with neurons with softmax
+    model = Model(inputs=base_model.inputs, outputs=predictions)  # input is based model input, output is custom
+
+    # we set every layer to be trainable
+    for layer in model.layers:
+        layer.trainable = True
+
+    return model
+
+
+def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epochs=10, batch_size=32):
+    """
+    :param percentage: percentage of samples to be used for training. Must be in [0,1].
+    :param nbr_epochs:
+    :param batch_size:
+    """
+
+    Inception_based_model = create_Inception_based_model()
+
+    Inception_based_model_save_folder = "model-saves/Inception_based/"
+
+    # create save path
+    if not os.path.exists(Inception_based_model_save_folder):
+        os.makedirs(Inception_based_model_save_folder)
+
+    Inception_based_model_save_path = Inception_based_model_save_folder + "best_trained_save.h5"
+
+    # checkpoints
+
+    # We can do learning rate adaptation later as part of fine tuning or use adaptive optimizer (rmsprop, adam)
+    # keras.callbacks.callbacks.LearningRateScheduler(schedule, verbose=0)
+    # keras.callbacks.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=10, verbose=0, mode='auto',
+    # min_delta=0.0001, cooldown=0, min_lr=0)
+
+    # saves the model when validation accuracy improves
+    save_on_improve = ModelCheckpoint(Inception_based_model_save_path, monitor='val_accuracy', verbose=1,
+                                      save_best_only=True, save_weights_only=False, mode='max')
+
+    # EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto',baseline=None, res
+    # tore_best_weights=False)
+
+
+    tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=32, write_graph=True,
+                              write_grads=False, write_images=False, embeddings_freq=0,
+                              embeddings_layer_names=None, embeddings_metadata=None,
+                              embeddings_data=None, update_freq='epoch')
+
+    callbacks = [save_on_improve, tensorboard]
+
+    # loss is categorical since we are classifying
+    Inception_based_model.compile(loss='categorical_crossentropy', optimizer="sgd", metrics=['accuracy'],
+                                  callbacks=callbacks)
+
+    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, percentage)
+
+    training_sample_generator = generate_from_paths_and_labels(train_samples, train_labels, batch_size,
+                                                               image_size=(224, 224, 3))
+
+    validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size,
+                                                                 image_size=(224, 224, 3))
+
+    nbr_train_samples = len(train_samples)
+    nbr_val_samples = len(val_samples)
+
+    # call to fit using a generator
+    history = Inception_based_model.fit_generator(
+        generator=training_sample_generator,
+        steps_per_epoch=math.ceil(nbr_train_samples / batch_size),
+        epochs=nbr_epochs,
+        validation_data=validation_sample_generator,
+        validation_steps=math.ceil(nbr_val_samples / batch_size),
+        verbose=1)
