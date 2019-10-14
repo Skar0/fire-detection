@@ -19,6 +19,19 @@ nbr_classes = 3
 
 # data augmentation is possible using opencv zooms and rotations
 
+def download_and_setup_test_dataset():
+    # downloading the test dataset
+    os.system(
+        'wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/test_database.tar')
+
+    datasets_path = "datasets"
+    if os.path.exists(datasets_path) == False:
+        os.makedirs(datasets_path)
+
+    # put the small dataset in datasets/small
+    os.system("tar xf test_database.tar -C 'datasets' --one-top-level && mv test_database.tar datasets/test")
+
+
 def download_and_setup_small_dataset():
     # downloading the first dataset
     os.system(
@@ -29,8 +42,8 @@ def download_and_setup_small_dataset():
         os.makedirs(datasets_path)
 
     # put the small dataset in datasets/small
-    os.system("tar xf defi1certif-datasets-fire_small.tar - C 'datasets' --one-top-level && mv "
-              "datasets/defi1certif-datasets-fire_small datasets/small")
+    os.system(
+        "tar xf defi1certif-datasets-fire_small.tar -C 'datasets' --one-top-level && mv datasets/defi1certif-datasets-fire_small datasets/small")
 
 
 def download_and_setup_medium_dataset():
@@ -51,7 +64,7 @@ def download_and_setup_medium_dataset():
               "defi1certif-datasets-fire_medium.tar.003 >> defi1certif-datasets-fire_medium.tar")
 
     # put the medium dataset in datasets/medium
-    os.system("tar xf defi1certif-datasets-fire_medium.tar - C 'datasets' --one-top-level && mv "
+    os.system("tar xf defi1certif-datasets-fire_medium.tar -C 'datasets' --one-top-level && mv "
               "datasets/defi1certif-datasets-fire_medium datasets/medium")
 
 
@@ -72,11 +85,11 @@ def download_and_setup_large_dataset():
 
     # recombine the tar files
     os.system("cat  defi1certif-datasets-fire_big.tar.001 defi1certif-datasets-fire_big.tar.002 "
-              "defi1certif-datasets-fire_big.tar.003 defi1certif-datasets-fire_big.tar.001 >> "
+              "defi1certif-datasets-fire_big.tar.003 defi1certif-datasets-fire_big.tar.004 >> "
               "defi1certif-datasets-fire_big.tar")
 
     # put the large dataset in datasets/large
-    os.system("tar xf defi1certif-datasets-fire_big.tar - C 'datasets' --one-top-level && mv "
+    os.system("tar xf defi1certif-datasets-fire_big.tar -C 'datasets' --one-top-level && mv "
               "datasets/defi1certif-datasets-fire_big datasets/large")
 
 
@@ -90,11 +103,11 @@ def setup_full_dataset():
     if not os.path.exists("datasets/all"):
         os.makedirs("datasets/all")
     if not os.path.exists("datasets/all/fire"):
-        os.makedirs("datasets/all")
+        os.makedirs("datasets/all/fire")
     if not os.path.exists("datasets/all/no_fire"):
-        os.makedirs("datasets/all")
+        os.makedirs("datasets/all/no_fire")
     if not os.path.exists("datasets/all/start_fire"):
-        os.makedirs("datasets/all")
+        os.makedirs("datasets/all/start_fire")
 
     # moving images from the small dataset to the full dataset
     os.system("find datasets/small/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/")
@@ -228,44 +241,57 @@ def create_VGG16_based_model():
     return model
 
 
-def graphically_test_model(model_path, classes_names, test_image_path, image_size=(224, 224)):
+def graphically_test_model(model_path, classes_names, test_image_dir, image_size=(224, 224)):
     nbr_classes = len(classes_names)
     model = load_model(model_path)
 
-    # load image using keras
-    img = image.load_img(test_image_path, target_size=image_size)
+    for test_image_path in os.listdir(test_image_dir):
+        # load image using keras
+        img = image.load_img(test_image_dir + "/" + test_image_path, target_size=image_size)
 
-    # processed image to feed the network
-    processed_img = image.img_to_array(img)
-    processed_img = np.expand_dims(processed_img, axis=0)
-    processed_img = preprocess_input(processed_img)
+        # processed image to feed the network
+        processed_img = image.img_to_array(img)
+        processed_img = np.expand_dims(processed_img, axis=0)
+        processed_img = preprocess_input(processed_img)
 
-    # get prediction using the network
-    predictions = model.predict(processed_img)[0]
-    # transform [0,1] values into percentages and associate it to its class name
-    result = [(classes_names[i], float(predictions[i]) * 100.0) for i in range(nbr_classes)]
-    # sort the result by percentage
-    result.sort(reverse=True, key=lambda x: x[1])
+        # get prediction using the network
+        predictions = model.predict(processed_img)[0]
+        # transform [0,1] values into percentages and associate it to its class name
+        result = [(classes_names[i], float(predictions[i]) * 100.0) for i in range(nbr_classes)]
+        # sort the result by percentage
+        result.sort(reverse=True, key=lambda x: x[1])
 
-    # load image for displaying
-    img = cv2.imread(test_image_path)
-    # transform into RGB
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    font = cv2.FONT_HERSHEY_COMPLEX
+        # load image for displaying
+        img = cv2.imread(test_image_dir + "/" + test_image_path)
+        # transform into RGB
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        font = cv2.FONT_HERSHEY_COMPLEX
 
-    # write class percentages on the image
-    for i in range(nbr_classes):
-        (class_name, prob) = result[i]
-        textsize = cv2.getTextSize(class_name, font, 1, 2)[0]
-        textX = (img.shape[1] - textsize[0]) / 2
-        textY = (img.shape[0] + textsize[1]) / 2
-        if (i == 0):
-            cv2.putText(img, class_name, (int(textX) - 100, int(textY)), font, 5, (255, 255, 255), 6, cv2.LINE_AA)
-        print("Top %d ====================" % (i + 1))
-        print("Class name: %s" % (class_name))
-        print("Probability: %.2f%%" % (prob))
-    plt.imshow(img)
-    plt.show()
+        # write class percentages on the image
+        for i in range(nbr_classes):
+            (class_name, prob) = result[i]
+            textsize = cv2.getTextSize(class_name, font, 1, 2)[0]
+            textX = (img.shape[1] - textsize[0]) / 2
+            textY = (img.shape[0] + textsize[1]) / 2
+            if (i == 0):
+                cv2.putText(img, class_name, (int(textX) - 100, int(textY)), font, 5, (255, 255, 255), 6, cv2.LINE_AA)
+            print("Top %d ====================" % (i + 1))
+            print("Class name: %s" % (class_name))
+            print("Probability: %.2f%%" % (prob))
+        plt.imshow(img)
+        plt.show()
+
+
+def evaluate_model(model_path, test_dataset):
+    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(test_dataset, classes, 0.001)
+    batch_size = 16
+    nbr_val_samples = len(val_samples)
+    validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size,
+                                                                 image_size=(224, 224, 3))
+
+    model = load_model(model_path)
+    model.evaluate_generator(validation_sample_generator, steps=math.ceil(nbr_val_samples / 16), callbacks=None,
+                             max_queue_size=10, workers=1, use_multiprocessing=True, verbose=1)
 
 
 def train_and_save_VGG16_based_model(dataset_path, percentage=0.9, nbr_epochs=10, batch_size=32):
@@ -357,7 +383,7 @@ def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epoch
     # min_delta=0.0001, cooldown=0, min_lr=0)
 
     # saves the model when validation accuracy improves
-    save_on_improve = ModelCheckpoint(Inception_based_model_save_path, monitor='val_accuracy', verbose=1,
+    save_on_improve = ModelCheckpoint(Inception_based_model_save_path, monitor='val_acc', verbose=1,
                                       save_best_only=True, save_weights_only=False, mode='max')
 
     # EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto',baseline=None, res
@@ -369,11 +395,10 @@ def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epoch
                               embeddings_layer_names=None, embeddings_metadata=None,
                               embeddings_data=None, update_freq='epoch')
 
-    callbacks = [save_on_improve, tensorboard]
+    cb = [save_on_improve, tensorboard]
 
     # loss is categorical since we are classifying
-    Inception_based_model.compile(loss='categorical_crossentropy', optimizer="sgd", metrics=['accuracy'],
-                                  callbacks=callbacks)
+    Inception_based_model.compile(loss='categorical_crossentropy', optimizer="sgd", metrics=['accuracy'])
 
     (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, percentage)
 
@@ -393,4 +418,4 @@ def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epoch
         epochs=nbr_epochs,
         validation_data=validation_sample_generator,
         validation_steps=math.ceil(nbr_val_samples / batch_size),
-        verbose=1)
+        callbacks=cb, verbose=1)
