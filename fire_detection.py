@@ -17,10 +17,6 @@ classes = ['fire', 'no_fire', 'start_fire']
 nbr_classes = 3
 
 
-# data augmentation is possible using opencv zooms and rotations
-
-
-
 def generate_from_paths_and_labels(images_paths, labels, batch_size, image_size=(224, 224),
                                    preprocessing=preprocess_input):
     """
@@ -135,59 +131,6 @@ def create_VGG16_based_model():
         layer.trainable = True
 
     return model
-
-
-def graphically_test_model(model_path, classes_names, test_image_dir, image_size=(224, 224)):
-    nbr_classes = len(classes_names)
-    model = load_model(model_path)
-
-    for test_image_path in os.listdir(test_image_dir):
-        # load image using keras
-        img = image.load_img(test_image_dir + "/" + test_image_path, target_size=image_size)
-
-        # processed image to feed the network
-        processed_img = image.img_to_array(img)
-        processed_img = np.expand_dims(processed_img, axis=0)
-        processed_img = preprocess_input(processed_img)
-
-        # get prediction using the network
-        predictions = model.predict(processed_img)[0]
-        # transform [0,1] values into percentages and associate it to its class name
-        result = [(classes_names[i], float(predictions[i]) * 100.0) for i in range(nbr_classes)]
-        # sort the result by percentage
-        result.sort(reverse=True, key=lambda x: x[1])
-
-        # load image for displaying
-        img = cv2.imread(test_image_dir + "/" + test_image_path)
-        # transform into RGB
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        font = cv2.FONT_HERSHEY_COMPLEX
-
-        # write class percentages on the image
-        for i in range(nbr_classes):
-            (class_name, prob) = result[i]
-            textsize = cv2.getTextSize(class_name, font, 1, 2)[0]
-            textX = (img.shape[1] - textsize[0]) / 2
-            textY = (img.shape[0] + textsize[1]) / 2
-            if (i == 0):
-                cv2.putText(img, class_name, (int(textX) - 100, int(textY)), font, 5, (255, 255, 255), 6, cv2.LINE_AA)
-            print("Top %d ====================" % (i + 1))
-            print("Class name: %s" % (class_name))
-            print("Probability: %.2f%%" % (prob))
-        plt.imshow(img)
-        plt.show()
-
-
-def evaluate_model(model_path, test_dataset):
-    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(test_dataset, classes, 0.001)
-    batch_size = 16
-    nbr_val_samples = len(val_samples)
-    validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size,
-                                                                 image_size=(224, 224, 3))
-
-    model = load_model(model_path)
-    model.evaluate_generator(validation_sample_generator, steps=math.ceil(nbr_val_samples / 16), callbacks=None,
-                             max_queue_size=10, workers=1, use_multiprocessing=True, verbose=1)
 
 
 def train_and_save_VGG16_based_model(dataset_path, percentage=0.9, nbr_epochs=10, batch_size=32):
