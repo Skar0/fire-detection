@@ -1,17 +1,14 @@
-import numpy as np
-import os
 import imghdr
 import math
-import cv2
-from keras.applications import InceptionV3
-from keras.callbacks import ModelCheckpoint, TensorBoard
-from matplotlib import pyplot as plt
+import os
+import numpy as np
 from keras import Model
-from keras.engine.saving import load_model
-from keras.layers import GlobalAveragePooling2D, Dense
-from keras.utils import np_utils
-from keras.preprocessing import image
+from keras.applications import InceptionV3
 from keras.applications.vgg16 import VGG16, preprocess_input
+from keras.callbacks import ModelCheckpoint, TensorBoard
+from keras.layers import GlobalAveragePooling2D, Dense
+from keras.preprocessing import image
+from keras.utils import np_utils
 
 classes = ['fire', 'no_fire', 'start_fire']
 nbr_classes = 3
