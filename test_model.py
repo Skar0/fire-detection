@@ -4,18 +4,18 @@ import os
 import math
 from keras.engine.saving import load_model
 from keras.preprocessing import image
-from keras_applications.vgg16 import preprocess_input
 from simple_models import extract_dataset, generate_from_paths_and_labels
 from matplotlib import pyplot as plt
 
 
-def graphically_test_model(model_path, classes_names, test_image_dir, image_size=(224, 224)):
+def graphically_test_model(model_path, classes_names, test_image_dir, preprocess_input, image_size=(224, 224)):
     """
     Loads a model, does a prediction on each image in test_image_dir and displays the image with the class name on
     top of it.
     :param model_path:
     :param classes_names:
     :param test_image_dir:
+    :param preprocess_input:
     :param image_size:
     """
     nbr_classes = len(classes_names)
@@ -59,18 +59,19 @@ def graphically_test_model(model_path, classes_names, test_image_dir, image_size
         plt.show()
 
 
-def evaluate_model(model_path, classes, dataset_path):
+def evaluate_model(model_path, classes, preprocessing, dataset_path):
     """
     Loads a model and evaluates the model (metrics) on images provided in folder a dataset.
     :param model_path:
     :param classes:
+    :param preprocessing:
     :param test_dataset:
     """
     # For simplicity, the dataset is loaded using 99.9% of images
     (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, 0.001)
     batch_size = 16
     nbr_val_samples = len(val_samples)
-    validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size,
+    validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size, preprocessing,
                                                                  image_size=(224, 224, 3))
 
     model = load_model(model_path)
