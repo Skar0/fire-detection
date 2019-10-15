@@ -5,7 +5,7 @@ import math
 from keras.engine.saving import load_model
 from keras.preprocessing import image
 from keras_applications.vgg16 import preprocess_input
-from fire_detection import extract_dataset, generate_from_paths_and_labels
+from simple_models import extract_dataset, generate_from_paths_and_labels
 from matplotlib import pyplot as plt
 
 
