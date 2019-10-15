@@ -51,7 +51,7 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessi
                 inputs
             )))
 
-            # preprocessing might notably normalize between 0 and 1 the RGB values, this is model-dependant
+            # preprocessing the batch might notably normalize between 0 and 1 the RGB values, this is model-dependant
             inputs = preprocessing(inputs)
 
             # yields the image batch and corresponding labels
