@@ -3,8 +3,10 @@ import math
 import os
 import numpy as np
 from keras import Model
-from keras.applications import InceptionV3
-from keras.applications.vgg16 import VGG16, preprocess_input
+from keras.applications.inception_v3 import InceptionV3
+from keras.applications.inception_v3 import preprocess_input as inception_preprocess_input
+from keras.applications.vgg16 import VGG16
+from keras.applications.vgg16 import preprocess_input as vgg16_preprocess_input
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import GlobalAveragePooling2D, Dense
 from keras.preprocessing import image
@@ -14,8 +16,7 @@ classes = ['fire', 'no_fire', 'start_fire']
 nbr_classes = 3
 
 
-def generate_from_paths_and_labels(images_paths, labels, batch_size, image_size=(224, 224),
-                                   preprocessing=preprocess_input):
+def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessing, image_size=(224, 224)):
     """
     Generator to give to the fit function, generates batches of samples for training.
     This avoids to load the full dataset in memory. This can also be a Keras class.
@@ -50,8 +51,8 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, image_size=
                 inputs
             )))
 
-            # preprocessing might notably normalize between 0 and 1 the RGB values
-            inputs = preprocess_input(inputs)
+            # preprocessing might notably normalize between 0 and 1 the RGB values, this is model-dependant
+            inputs = preprocessing(inputs)
 
             # yields the image batch and corresponding labels
             yield (inputs, labels[i:i + batch_size])
@@ -151,10 +152,10 @@ def train_and_save_VGG16_based_model(dataset_path, percentage=0.9, nbr_epochs=10
     (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, percentage)
 
     training_sample_generator = generate_from_paths_and_labels(train_samples, train_labels, batch_size,
-                                                               image_size=(224, 224, 3))
+                                                               vgg16_preprocess_input, image_size=(224, 224, 3))
 
     validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size,
-                                                                 image_size=(224, 224, 3))
+                                                                 vgg16_preprocess_input, image_size=(224, 224, 3))
 
     nbr_train_samples = len(train_samples)
     nbr_val_samples = len(val_samples)
@@ -239,10 +240,10 @@ def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epoch
     (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, percentage)
 
     training_sample_generator = generate_from_paths_and_labels(train_samples, train_labels, batch_size,
-                                                               image_size=(224, 224, 3))
+                                                               inception_preprocess_input, image_size=(224, 224, 3))
 
     validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size,
-                                                                 image_size=(224, 224, 3))
+                                                                 inception_preprocess_input, image_size=(224, 224, 3))
 
     nbr_train_samples = len(train_samples)
     nbr_val_samples = len(val_samples)
