@@ -12,11 +12,13 @@ from keras.layers import Dense
 from keras.utils import np_utils
 from keras_preprocessing.image import ImageDataGenerator
 
+import cladoh
+
 classes = ['fire', 'no_fire', 'start_fire']
 nbr_classes = 3
 
 
-def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessing, augment, image_size=(224, 224)):
+def generate_from_paths_and_labels(images_paths, labels, batch_size, augment, image_size=(224, 224)):
     """
     Generator to give to the fit function, generates batches of samples for training.
     This avoids to load the full dataset in memory. This can also be a Keras class.
@@ -85,7 +87,7 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessi
                     print(labels[j])
 
             # preprocessing the batch might notably normalize between 0 and 1 the RGB values, this is model-dependant
-            inputs = preprocessing(inputs)
+            inputs = cladoh.preprocess_input_custom(inputs)
 
             # yields the image batch and corresponding labels
             yield (inputs, labels[i:i + batch_size])
@@ -111,10 +113,17 @@ def extract_dataset(dataset_path, classes_names, percentage):
 
     num_classes = len(classes_names)
 
+    # ignore hidden files
+    def listdir_nohidden(path):
+        for f in os.listdir(path):
+            if not f.startswith('.'):
+                yield f
+
+
     train_labels, val_labels = np.empty([1, 0]), np.empty([1, 0])
     train_samples, val_samples = np.empty([1, 0]), np.empty([1, 0])
 
-    for class_name in os.listdir(dataset_path):
+    for class_name in listdir_nohidden(dataset_path):
         # putting images paths and labels in lists to work on them
         images_paths, labels = [], []
 
@@ -122,7 +131,7 @@ def extract_dataset(dataset_path, classes_names, percentage):
         class_id = classes_names.index(class_name)  # class id = index of the class_name in classes_name, later o-h enc
 
         # here we are considering all paths for images labeled class_id
-        for path in os.listdir(class_path):
+        for path in listdir_nohidden(class_path):
             path = os.path.join(class_path, path)  # image path
             # test the image data contained in the file , and returns a string describing the image type
             if imghdr.what(path) is None:
