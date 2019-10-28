@@ -6,7 +6,7 @@ from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.models import load_model, save_model
 from cladoh import Cladoh
 from setup_datasets import *
-from custom_models import *
+from train_inception_based_model import *
 
 
 whole_printer = 0

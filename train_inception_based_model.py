@@ -2,6 +2,8 @@ import imghdr
 import os
 import math
 import numpy as np
+from keras.engine.saving import load_model
+from keras.optimizers import SGD
 from keras.preprocessing import image
 from matplotlib import pyplot as plt
 from keras import Model
@@ -12,7 +14,12 @@ from keras.layers import Dense
 from keras.utils import np_utils
 from keras_preprocessing.image import ImageDataGenerator
 
-import cladoh
+"""
+This module contains functions used to create training and validation datasets using with proper representation of each
+class. It also contains a batch generator which performs data augmentation (shifts, rotations, flips and zooms) on the
+fly. Finally, transfer learning from an InceptionV3-based model is performed and the model is re-trained for fire
+images using our augmented dataset.
+"""
 
 classes = ['fire', 'no_fire', 'start_fire']
 nbr_classes = 3
@@ -37,7 +44,9 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessi
     :param image_size:
     :return:
     """
-    display = False
+
+    display = False  # whether to display data augmentation on a subset of the batch
+
     number_samples = len(images_paths)
     if augment:
         datagen = ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True,
@@ -62,7 +71,7 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessi
             ))
 
             if augment:
-                # converting the loaded images to numpy arrays
+                # converting the loaded images to numpy arrays and applying augmentation
                 inputs = np.array(list(map(
                     lambda x: datagen.random_transform(image.img_to_array(x)),
                     inputs
@@ -83,7 +92,7 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessi
                     img = inputs[j].astype('uint8')
                     # plot raw pixel data
                     plt.imshow(img)
-                    print("------:-:-:-:-:--::---")
+                    print("class")
                     print(labels[j])
 
             # preprocessing the batch might notably normalize between 0 and 1 the RGB values, this is model-dependant
@@ -118,7 +127,6 @@ def extract_dataset(dataset_path, classes_names, percentage):
         for f in os.listdir(path):
             if not f.startswith('.'):
                 yield f
-
 
     train_labels, val_labels = np.empty([1, 0]), np.empty([1, 0])
     train_samples, val_samples = np.empty([1, 0]), np.empty([1, 0])
@@ -209,15 +217,24 @@ def create_Inception_based_model():
     return model
 
 
-def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epochs=10, batch_size=32):
+def train_and_save_Inception_based_model(dataset_path, fine_tune_existing=None, learning_rate=0.001, percentage=0.9, nbr_epochs=10, batch_size=32):
     """
-    :param dataset_path:
+    Creates and train an InceptionV3-based model on the fire images dataset or fine-tunes an pre-trained model with a
+    custom learning rate.
+    :param dataset_path: path to the dataset.
+    :param fine_tune_existing: whether a model was already trained and to just continue fine-tuning it. Its value should
+    be the path to the existing model to be loaded or None if no prior model is to be loaded.
+    :param learning_rate: when fine-tuning, the learning rate can be specified.
     :param percentage: percentage of samples to be used for training. Must be in [0,1].
     :param nbr_epochs:
     :param batch_size:
     """
 
-    Inception_based_model = create_Inception_based_model()
+    #  if a pre-trained model is specified, load it. Else create the model.
+    if fine_tune_existing is not None:
+        Inception_based_model = load_model(fine_tune_existing)
+    else:
+        Inception_based_model = create_Inception_based_model()
 
     Inception_based_model_save_folder = "model-saves/Inception_based/"
 
@@ -248,7 +265,14 @@ def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epoch
     cb = [save_on_improve, tensorboard]
 
     # loss is categorical since we are classifying
-    Inception_based_model.compile(loss='categorical_crossentropy', optimizer="sgd", metrics=['accuracy'])
+    # if a pre-trained model was specified, we are fine tuning and need to take the custom learning rate into account
+    if fine_tune_existing is not None:
+
+        sgd = SGD(lr=learning_rate, momentum=0.0, nesterov=False)  # default is 0.01
+        Inception_based_model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+
+    else:
+        Inception_based_model.compile(loss='categorical_crossentropy', optimizer="sgd", metrics=['accuracy'])
 
     (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, percentage)
 
