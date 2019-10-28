@@ -18,7 +18,7 @@ classes = ['fire', 'no_fire', 'start_fire']
 nbr_classes = 3
 
 
-def generate_from_paths_and_labels(images_paths, labels, batch_size, augment, image_size=(224, 224)):
+def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessing, augment, image_size=(224, 224)):
     """
     Generator to give to the fit function, generates batches of samples for training.
     This avoids to load the full dataset in memory. This can also be a Keras class.
@@ -87,7 +87,7 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, augment, im
                     print(labels[j])
 
             # preprocessing the batch might notably normalize between 0 and 1 the RGB values, this is model-dependant
-            inputs = cladoh.preprocess_input_custom(inputs)
+            inputs = preprocessing(inputs)
 
             # yields the image batch and corresponding labels
             yield (inputs, labels[i:i + batch_size])

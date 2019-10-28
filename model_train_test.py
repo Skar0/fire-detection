@@ -69,11 +69,19 @@ def train_and_save_model(dataset_path, percentage=0.8, nbr_epochs=10, batch_size
         print(val_samples.shape)
         print(val_labels.shape)
 
-    training_sample_generator = generate_from_paths_and_labels(train_samples, train_labels, batch_size,
-                                                               image_size=(224, 224, 3), augment=True)
+    training_sample_generator = generate_from_paths_and_labels(train_samples,
+                                                               train_labels,
+                                                               batch_size,
+                                                               cladoh.preprocess_input_custom,
+                                                               True,
+                                                               image_size=(224, 224, 3))
 
-    validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size,
-                                                                 image_size=(224, 224, 3), augment=True)
+    validation_sample_generator = generate_from_paths_and_labels(val_samples,
+                                                                 val_labels,
+                                                                 batch_size,
+                                                                 cladoh.preprocess_input_custom,
+                                                                 True,
+                                                                 image_size=(224, 224, 3))
 
     nbr_train_samples = len(train_samples)
     nbr_val_samples = len(val_samples)
