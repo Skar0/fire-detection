@@ -1,6 +1,6 @@
 import argparse
 
-from test_model import graphically_test_model, evaluate_model
+from analyze_model_performance import graphically_test_model, evaluate_model, extract_hard_samples
 from train_inception_based_model import train_and_save_Inception_based_model
 from video_fire_detection import detect_fire_on_the_fly
 from keras.applications.inception_v3 import preprocess_input as inception_preprocess_input
@@ -162,6 +162,33 @@ if __name__ == '__main__':
                                 default=12,
                                 required=False)
 
+    parser_extract = subparsers.add_parser('extract',
+                                           help='Extract hard examples from a dataset.')
+
+    parser_extract.add_argument('-data',
+                                type=str,
+                                action='store',
+                                dest='dataset',
+                                help='Path to a dataset.',
+                                default=argparse.SUPPRESS,
+                                required=True)
+
+    parser_extract.add_argument('-model',
+                                type=str,
+                                action='store',
+                                dest='model_path',
+                                help='Path to a trained model.',
+                                default=argparse.SUPPRESS,
+                                required=True)
+
+    parser_extract.add_argument('-threshold',
+                                type=float,
+                                action='store',
+                                dest='extract_threshold',
+                                help='Threshold for the hard examples.',
+                                default=argparse.SUPPRESS,
+                                required=True)
+
     parser_test = subparsers.add_parser('test',
                                            help='Test a model on a test set of images.')
 
@@ -212,6 +239,9 @@ if __name__ == '__main__':
                                inception_preprocess_input,
                                (224,224),
                                parsed.freq)
+
+    elif parsed.mode == "extract":
+        print(extract_hard_samples(parsed.model_path, inception_preprocess_input, parsed.dataset, parsed.extract_threshold))
 
     elif parsed.mode == "test":
         print(evaluate_model(parsed.model_path, classes, inception_preprocess_input, parsed.dataset))
