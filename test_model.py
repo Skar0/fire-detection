@@ -68,12 +68,12 @@ def evaluate_model(model_path, classes, preprocessing, dataset_path):
     :param test_dataset:
     """
     # For simplicity, the dataset is loaded using 99.9% of images
-    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, 0.001)
+    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, 0)
     batch_size = 16
     nbr_val_samples = len(val_samples)
     validation_sample_generator = generate_from_paths_and_labels(val_samples, val_labels, batch_size, preprocessing,
                                                                  image_size=(224, 224, 3))
 
     model = load_model(model_path)
-    model.evaluate_generator(validation_sample_generator, steps=math.ceil(nbr_val_samples / 16), callbacks=None,
+    return model.evaluate_generator(validation_sample_generator, steps=math.ceil(nbr_val_samples / 16),
                              max_queue_size=10, workers=1, use_multiprocessing=True, verbose=1)
