@@ -1,6 +1,9 @@
 import os
 
-# test test
+"""
+This module contains functions which allow to download and setup the datasets used for this project.
+"""
+
 
 def download_and_setup_test_dataset():
     """
@@ -20,7 +23,6 @@ def download_and_setup_test_dataset():
 def download_and_setup_small_dataset():
     """
     Downloading the small dataset.
-
     """
     os.system(
         'wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/defi1certif-datasets-fire_small.tar')
@@ -120,20 +122,18 @@ def setup_full_dataset():
     os.system("find datasets/large/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/")
     os.system("find datasets/large/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/")
 
-########################################################################################################################
-########################################################################################################################
 
 size_rep_dict = {'small': 0, 'medium': 3, 'big': 4}
 
 
 def necessary_setup_fire_detection(size='small'):
     datasets_path = 'datasets' + '/' + size
-    fire = not(os.path.exists(datasets_path + '/fire') and
-               len(os.listdir(datasets_path + '/fire')) != 0)
-    no_fire = not(os.path.exists(datasets_path + '/no_fire') and
-                  len(os.listdir(datasets_path + '/no_fire')) != 0)
-    start_fire = not(os.path.exists(datasets_path + '/start_fire') and
-                     len(os.listdir(datasets_path + '/start_fire')) != 0)
+    fire = not (os.path.exists(datasets_path + '/fire') and
+                len(os.listdir(datasets_path + '/fire')) != 0)
+    no_fire = not (os.path.exists(datasets_path + '/no_fire') and
+                   len(os.listdir(datasets_path + '/no_fire')) != 0)
+    start_fire = not (os.path.exists(datasets_path + '/start_fire') and
+                      len(os.listdir(datasets_path + '/start_fire')) != 0)
 
     return fire and no_fire and start_fire
 
@@ -244,27 +244,31 @@ def setup_full_dataset_fire_detection(verbose=0):
 
     verprint('- moving files', flush=True)
     # moving images from the small dataset to the full dataset
-    verprint('+ executing: ' + "find datasets/small/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/", flush=True)
+    verprint('+ executing: ' + "find datasets/small/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/",
+             flush=True)
     os.system("find datasets/small/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/")
 
     verprint('+ executing: ' + "find datasets/small/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/",
-          flush=True)
+             flush=True)
     os.system("find datasets/small/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/")
 
-    verprint('+ executing: ' + "find datasets/small/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/",
-          flush=True)
+    verprint(
+        '+ executing: ' + "find datasets/small/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/",
+        flush=True)
     os.system("find datasets/small/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/")
 
     # moving images from the medium dataset to the full dataset
-    verprint('+ executing: ' + "find datasets/medium/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/", flush=True)
+    verprint('+ executing: ' + "find datasets/medium/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/",
+             flush=True)
     os.system("find datasets/medium/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/")
 
     verprint('+ executing: ' + "find datasets/medium/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/",
-          flush=True)
+             flush=True)
     os.system("find datasets/medium/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/")
 
-    verprint('+ executing: ' + "find datasets/medium/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/",
-          flush=True)
+    verprint(
+        '+ executing: ' + "find datasets/medium/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/",
+        flush=True)
     os.system("find datasets/medium/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/")
 
     # moving images from the large dataset to the full dataset
@@ -272,11 +276,11 @@ def setup_full_dataset_fire_detection(verbose=0):
     os.system("find datasets/big/fire -type f -print0 | xargs -0 mv -t datasets/all/fire/")
 
     verprint('+ executing: ' + "find datasets/big/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/",
-          flush=True)
+             flush=True)
     os.system("find datasets/big/no_fire -type f -print0 | xargs -0 mv -t datasets/all/no_fire/")
 
     verprint('+ executing: ' + "find datasets/big/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/",
-          flush=True)
+             flush=True)
     os.system("find datasets/big/start_fire -type f -print0 | xargs -0 mv -t datasets/all/start_fire/")
 
     verprint("- files moved to:'datasets/all/", flush=True)

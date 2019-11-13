@@ -12,6 +12,10 @@ from keras.layers import GlobalAveragePooling2D, Dense
 from keras.preprocessing import image
 from keras.utils import np_utils
 
+"""
+This module contains naive transfer learning from VGG16 and InceptionV3 for fire detection.
+"""
+
 classes = ['fire', 'no_fire', 'start_fire']
 nbr_classes = 3
 
@@ -25,9 +29,10 @@ def generate_from_paths_and_labels(images_paths, labels, batch_size, preprocessi
     :param batch_size:
     :param image_size:
     :param preprocessing:
-    :return:
     """
+
     number_samples = len(images_paths)
+
     while 1:
         perm = np.random.permutation(number_samples)  # randomize the order of the images (to be done after each epoch)
 
@@ -64,6 +69,7 @@ def extract_dataset(dataset_path, classes_names, percentage):
     All image paths are loaded into a numpy array, corresponding labels are one-hot encoded and put into a numpy array.
     Samples are shuffled before splitting into training and validation sets to prevent problems since samples are loaded
     in order of their class.
+
     :param dataset_path: path to the root of the dataset.
     :param classes_names: names of the classes.
     :param percentage: percentage of samples to be used for training, the rest is for validation. Must be in [0,1].
@@ -115,6 +121,7 @@ def create_VGG16_based_model():
     VGG16-based model.
     :return: the model.
     """
+
     # the 3 fully connected layers at the end are not included
     # weights are pre-trained with imagenet
     base_model = VGG16(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
@@ -197,6 +204,7 @@ def create_Inception_based_model():
 
 def train_and_save_Inception_based_model(dataset_path, percentage=0.9, nbr_epochs=10, batch_size=32):
     """
+    :param dataset_path:
     :param percentage: percentage of samples to be used for training. Must be in [0,1].
     :param nbr_epochs:
     :param batch_size:
