@@ -20,3 +20,8 @@ This applies rotations, zooms and translations randomly to the training set.
 The result of our models, measured by categorical loss and accuracy is summarized in the following table.
 
 The Inception-V3-based model has very good performance.
+
+![](video_examples/video_0.gif)
+![](video_examples/video_1.gif)
+![](video_examples/video_2.gif)
+![](video_examples/video_3.gif)
