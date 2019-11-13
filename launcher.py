@@ -3,7 +3,7 @@ import numpy as np
 from keras.engine.saving import load_model
 from keras.preprocessing import image
 from evaluate_model import evaluate_model, extract_hard_samples
-from train_inception_based_model import train_simpler_inception_based_model
+from transfer_learning import train_simpler_inception_based_model
 from video_annotation import video_fire_detection
 from keras.applications.inception_v3 import preprocess_input as inception_preprocess_input
 
