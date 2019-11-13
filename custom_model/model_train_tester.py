@@ -1,9 +1,9 @@
-from cladoh import Cladoh
-
-import os
 import math
+import os
 
 from keras.callbacks import ModelCheckpoint, TensorBoard
+from custom_model.cladoh import Cladoh
+from setup.naive_approach import generate_from_paths_and_labels, extract_dataset
 
 whole_printer = 0
 
@@ -50,7 +50,7 @@ def train_and_save_cladoh_model(dataset_path, percentage=0.8, nbr_epochs=10, bat
     model.compile(loss='categorical_crossentropy', optimizer="sgd", metrics=['accuracy'], )
     # callbacks=callbacks)
 
-    (train_samples, train_labels), (val_samples, val_labels) = setup_datasets.extract_dataset(dataset_path, classes, percentage)
+    (train_samples, train_labels), (val_samples, val_labels) = extract_dataset(dataset_path, classes, percentage)
 
     if whole_printer:
         print(train_samples.shape)

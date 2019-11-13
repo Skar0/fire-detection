@@ -1,13 +1,8 @@
-import os
-import math
 import argparse
 
-from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.models import load_model, save_model
-from cladoh import Cladoh
-from setup_datasets import *
-from train_inception_based_model import *
-
+from custom_model.cladoh import Cladoh, preprocess_input_custom
+from setup.setup_datasets import *
+from transfer_learning import *
 
 whole_printer = 0
 
@@ -69,19 +64,19 @@ def train_and_save_model(dataset_path, percentage=0.8, nbr_epochs=10, batch_size
         print(val_samples.shape)
         print(val_labels.shape)
 
-    training_sample_generator = generate_from_paths_and_labels(train_samples,
-                                                               train_labels,
-                                                               batch_size,
-                                                               cladoh.preprocess_input_custom,
-                                                               True,
-                                                               image_size=(224, 224, 3))
+    training_sample_generator = augmented_batch_generator(train_samples,
+                                                          train_labels,
+                                                          batch_size,
+                                                          preprocess_input_custom,
+                                                          True,
+                                                          image_size=(224, 224, 3))
 
-    validation_sample_generator = generate_from_paths_and_labels(val_samples,
-                                                                 val_labels,
-                                                                 batch_size,
-                                                                 cladoh.preprocess_input_custom,
-                                                                 True,
-                                                                 image_size=(224, 224, 3))
+    validation_sample_generator = augmented_batch_generator(val_samples,
+                                                            val_labels,
+                                                            batch_size,
+                                                            preprocess_input_custom,
+                                                            True,
+                                                            image_size=(224, 224, 3))
 
     nbr_train_samples = len(train_samples)
     nbr_val_samples = len(val_samples)
