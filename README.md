@@ -50,11 +50,14 @@ The datasets can be setup using functions defines in setup_datasets.py. The mode
 ## Usage
 
 #### Requirements:
-    keras_preprocessing==1.0.5
-    keras_applications==1.0.7
-    keras==2.2.0
-    keras_applications==1.0.7
-    opencv
+imageio==2.6.1
+imageio-ffmpeg==0.3.0
+Keras==2.1.6
+matplotlib==2.2.3
+numpy==1.15.1
+opencv-contrib-python==3.4.0.12
+Pillow==5.2.0
+tensorflow==1.5.1
    
 #### Launcher
 
