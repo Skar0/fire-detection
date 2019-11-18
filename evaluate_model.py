@@ -3,7 +3,7 @@ import os
 
 import cv2
 import numpy as np
-from keras.engine.saving import load_model
+from keras.models import load_model
 from keras.preprocessing import image
 from matplotlib import pyplot as plt
 

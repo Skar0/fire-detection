@@ -2,7 +2,7 @@ import imghdr
 import os
 import math
 import numpy as np
-from keras.engine.saving import load_model
+from keras.models import load_model
 from keras.optimizers import SGD
 from keras.preprocessing import image
 from matplotlib import pyplot as plt
@@ -354,6 +354,7 @@ def create_simpler_inception_based_model():
 
 def train_simpler_inception_based_model(dataset_path,
                                         fine_tune_existing=None,
+                                        save_path="best_trained_save.h5",
                                         freeze=True,
                                         learning_rate=0.001,
                                         percentage=0.9,
@@ -395,7 +396,9 @@ def train_simpler_inception_based_model(dataset_path,
     if not os.path.exists(simpler_inception_based_model_save_folder):
         os.makedirs(simpler_inception_based_model_save_folder)
 
-    simpler_inception_based_model_save_path = simpler_inception_based_model_save_folder + "best_trained_save.h5"
+    simpler_inception_based_model_save_path = simpler_inception_based_model_save_folder + save_path
+
+    simpler_inception_based_model.summary()
 
     # We can do learning rate adaptation later as part of fine tuning or use adaptive optimizer (rmsprop, adam)
     # keras.callbacks.callbacks.LearningRateScheduler(schedule, verbose=0)
