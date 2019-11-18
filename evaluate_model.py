@@ -152,9 +152,9 @@ def extract_hard_samples(model_path, preprocess_input, dataset_path, threshold, 
         class_name = classes[i]
 
         # for each sample of that class
-        for sample_path in os.listdir(dataset_path + "/" + class_name):
+        for sample_path in os.listdir(dataset_path + class_name):
 
-            img = image.load_img(dataset_path + "/" + class_name + "/" + sample_path, target_size=image_size)
+            img = image.load_img(dataset_path + class_name + "/" + sample_path, target_size=image_size)
 
             # processed image to feed the network
             processed_img = image.img_to_array(img)
