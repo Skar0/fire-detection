@@ -415,21 +415,8 @@ def train_simpler_inception_based_model(dataset_path,
                                       save_weights_only=False,
                                       mode='max')
 
-    # write logs to ./logs for Tensorboard visualization
-    tensorboard = TensorBoard(log_dir='./logs',
-                              histogram_freq=0,
-                              batch_size=32,
-                              write_graph=True,
-                              write_grads=False,
-                              write_images=False,
-                              embeddings_freq=0,
-                              embeddings_layer_names=None,
-                              embeddings_metadata=None,
-                              embeddings_data=None,
-                              update_freq='epoch')
-
     # callbacks
-    cb = [save_on_improve, tensorboard]
+    cb = [save_on_improve]
 
     # loss is categorical since we are classifying
     # if a pre-trained model was specified, we are fine tuning and need to take the custom learning rate into account
