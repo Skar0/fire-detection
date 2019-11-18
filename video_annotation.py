@@ -106,12 +106,7 @@ def video_fire_detection(input_video_path, output_video_path, model_path, model_
                 # perform the prediction
                 probabilities = model.predict(img,
                                               batch_size=1,
-                                              verbose=0,
-                                              steps=None,
-                                              callbacks=None,
-                                              max_queue_size=10,
-                                              workers=1,
-                                              use_multiprocessing=False)[0]
+                                              verbose=0)[0]
 
                 # transform [0,1] values into percentages and associate it to its class name
                 result = [(classes[i], float(probabilities[i]) * 100.0) for i in range(nbr_classes)]
