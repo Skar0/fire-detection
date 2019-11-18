@@ -6,7 +6,8 @@ video (with fires not moving very fast, this assumption is somewhat sound) and g
 
 A description of the project, along with examples of video annotation by our network is provided below.
 
-<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_0.gif" width="350">
+<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_0.gif" width="300">      <img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_1.gif" width="300">
+
 
 ## Datasets
 #### Provided dataset
@@ -107,6 +108,8 @@ On the provided test set :
 
 Examples of videos annotated by our model can be found below.
 
-<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_1.gif" width="350"> <img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_2.gif" width="350">
-<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_3.gif" width="350"><img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_0.gif" width="350">
+<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_1.gif" width="350">
+<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_2.gif" width="350">
+<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_3.gif" width="350">
+<img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_0.gif" width="350">
 
