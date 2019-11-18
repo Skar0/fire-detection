@@ -27,6 +27,7 @@ Our goal was to create a legible project which handles every aspect of CNN creat
 ├── transfer_learning.py
 ├── video_annotation.py
 ├── evaluate_model.py
+├── transfer_learned_model.h5
 ├── setup/
 │   ├── setup_datasets.py
 │   └── naive_approach.py
@@ -96,14 +97,25 @@ The video given by INPUT_VIDEO_PATH is processed and prediction is performed on 
 ## Results
 
 #### Trained model file
-Our trained model file containing the model architecture and trained weights can be found in.
+Our trained model file containing the model architecture and trained weights is the file transfer_learned_model.h5 at the root of the project.
 
 #### Performance
 The performance of our model, measured by categorical loss and accuracy is the following:
 
-On the whole dataset : 
 On the provided test set :
 
+    transfer_learned_model.h5
+    100 samples
+    loss : 0.3496805104602239 | acc : 0.9108910891089109 
+    
+On the whole dataset :
+
+    transfer_learned_model.h5
+    5953 samples
+    loss : 0.0360565472869205 | acc : 0.9914328909793382
+    
+From our experiments, it seems that 'fire' and 'no fire' images are always lassified with high accuracy. Images labelled 'start fire' are harder to classify for the network. This may be explained by the fact that 'fire' images may contain smoke and that 'start fire' images sometimes contain small flames.
+    
 #### Video examples
 
 Examples of videos annotated by our model can be found below.
