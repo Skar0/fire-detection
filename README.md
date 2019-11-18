@@ -50,14 +50,16 @@ The datasets can be setup using functions defines in setup_datasets.py. The mode
 ## Usage
 
 #### Requirements:
-imageio==2.6.1
-imageio-ffmpeg==0.3.0
-Keras==2.1.6
-matplotlib==2.2.3
-numpy==1.15.1
-opencv-contrib-python==3.4.0.12
-Pillow==5.2.0
-tensorflow==1.5.1
+The project was tested with the following versions of librairies:
+
+      imageio==2.6.1
+      imageio-ffmpeg==0.3.0
+      Keras==2.1.6
+      matplotlib==2.2.3
+      numpy==1.15.1
+      opencv-contrib-python==3.4.0.12
+      Pillow==5.2.0
+      tensorflow==1.5.1
    
 #### Launcher
 
