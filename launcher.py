@@ -173,7 +173,7 @@ if __name__ == '__main__':
                               required=True)
 
     parser_video.add_argument('-freq',
-                              type=str,
+                              type=int,
                               action='store',
                               dest='freq',
                               help='Prediction is to be made every freq frames.',
