@@ -12,7 +12,7 @@ from keras.applications.inception_v3 import preprocess_input as inception_prepro
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Dense
 from keras.utils import np_utils
-from keras_preprocessing.image import ImageDataGenerator
+from keras.preprocessing.image import ImageDataGenerator
 
 """
 This module contains functions used to create training and validation datasets using with proper representation of each
