@@ -1,2 +1,2 @@
 transfer_learned_model.h5 filter=lfs diff=lfs merge=lfs -text
-.ipynb linguist-documentation
+*.ipynb linguist-documentation
