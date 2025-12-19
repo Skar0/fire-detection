@@ -130,3 +130,15 @@ Examples of videos annotated by our model can be found below.
 <img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_3.gif" width="350">
 <img src="https://github.com/Skar0/fire-detection/blob/master/video_examples/video_0.gif" width="350">
 
+## Running the Project in Jupyter Notebook
+
+You can run and experiment with this project using Jupyter Notebook for easier exploration and debugging.
+
+### Setup Jupyter Notebook
+
+If Jupyter is not installed, install it using:
+```bash
+pip install notebook
+jupyter notebook
+!python launcher.py
+!python evaluate_model.py
